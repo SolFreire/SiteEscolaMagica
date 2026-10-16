@@ -1,0 +1,235 @@
+---
+import Button from '../ui/Button.astro';
+import { hero } from '../../data/site';
+---
+
+<section class="hero theme-dark">
+  <div class="hero-visual" data-hero-parallax>
+    <img class="hero-back" src={hero.back.src} alt={hero.back.alt} loading="eager" fetchpriority="high" />
+    <img class="hero-front" src={hero.front.src} alt={hero.front.alt} loading="eager" />
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <h2 class="hero-title">
+      <span class="hero-title-normal">{hero.titleNormal}</span>
+      <span class="hero-title-accent">{hero.titleAccent}</span>
+    </h2>
+    <p class="hero-subtitle">
+      {hero.subtitle} <strong>{hero.subtitleHighlight}</strong>
+    </p>
+  </div>
+
+  <div class="hero-card">
+    <div class="hero-card-text">
+      <p class="hero-card-eyebrow">{hero.card.eyebrow}</p>
+      <h3 class="hero-card-title">{hero.card.title}</h3>
+      <Button href={hero.card.link.href} variant="link" size="small" arrow>{hero.card.link.label}</Button>
+    </div>
+    <div class="hero-card-thumb">
+      <img src={hero.card.image} alt="" loading="lazy" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(100svh, 40rem);
+    overflow: clip;
+    background: var(--c-cherry);
+    padding-inline: var(--page-padding);
+  }
+
+  .hero-visual {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  .hero-visual img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-back {
+    object-fit: cover;
+  }
+  .hero-front {
+    z-index: 3;
+    object-fit: contain;
+    object-position: 50% 100%;
+    transform-origin: 50% 100%;
+    transform: translateX(-3vw) scale(0.75);
+  }
+  @media (max-width: 991px) {
+    .hero-front {
+      transform: translateX(-2vw) scale(0.82);
+    }
+  }
+  @media (max-width: 479px) {
+    .hero-front {
+      transform: translateX(-1vw) scale(0.9);
+    }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50%;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.65), transparent);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    min-height: max(100svh, 40rem);
+    padding-block: 8rem 10rem;
+  }
+
+  .hero-title {
+    margin-top: auto;
+    font-family: var(--font-display);
+  }
+  .hero-title-normal {
+    display: block;
+    font-size: clamp(var(--fs-3xl), 6vw, var(--fs-6xl));
+    line-height: 1;
+  }
+  .hero-title-accent {
+    display: block;
+    margin-top: -0.1em;
+    padding-left: 5vw;
+    font-size: clamp(var(--fs-6xl), 17.5vw, 17.5rem);
+    line-height: 0.9;
+    color: var(--c-mauve);
+    text-shadow: 0 0 35px rgba(168, 85, 247, 0.5);
+  }
+
+  .hero-subtitle {
+    max-width: 32rem;
+    margin: 2rem 0 0 auto;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    line-height: 1.2;
+    text-align: right;
+  }
+  .hero-subtitle strong {
+    position: relative;
+    display: inline-block;
+    font-weight: inherit;
+    color: var(--c-cherry);
+  }
+  .hero-subtitle strong::before {
+    content: '';
+    position: absolute;
+    inset: 0 -5px;
+    z-index: -1;
+    background: var(--c-linen);
+    transform-origin: left center;
+    animation: highlight 0.6s var(--ease-out) 1.8s both;
+  }
+  @keyframes highlight {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  .hero-card {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    max-width: min(26rem, 90vw);
+    border-top-right-radius: 3.5rem;
+    overflow: hidden;
+    background: var(--c-ink);
+    color: var(--c-linen);
+  }
+  .hero-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem 1.5rem;
+  }
+  .hero-card-eyebrow {
+    font-size: var(--fs-s);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+  }
+  .hero-card-title {
+    font-size: var(--fs-xl);
+    color: var(--c-mauve);
+  }
+  .hero-card-thumb {
+    flex: 0 0 9rem;
+    overflow: hidden;
+  }
+  .hero-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .hero-card:hover .hero-card-thumb img {
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 600px) {
+    .hero-card-thumb {
+      display: none;
+    }
+  }
+
+  /* Entrada do título */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-title-normal,
+    .hero-title-accent,
+    .hero-subtitle {
+      animation: rise 1s var(--ease-out) both;
+    }
+    .hero-title-normal {
+      animation-delay: 1.1s;
+    }
+    .hero-title-accent {
+      animation-delay: 1.3s;
+    }
+    .hero-subtitle {
+      animation-delay: 1.5s;
+    }
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(0.5em);
+      }
+    }
+  }
+</style>
+
+<script>
+  // Leve parallax das imagens de fundo enquanto o hero está visível.
+  const visual = document.querySelector<HTMLElement>('[data-hero-parallax]');
+  if (visual && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const y = Math.min(window.scrollY, window.innerHeight);
+      visual.style.transform = `translate3d(0, ${y * 0.25}px, 0)`;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!queued) {
+          queued = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+  }
+</script>

@@ -1,0 +1,185 @@
+/* ---------- Fontes ---------- */
+@font-face {
+  font-family: 'Wizard World';
+  src: url('/fonts/WizardWorldSimplified-Kxr7.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Light Az.otf') format('opentype'); font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Regular Az.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Regular Italic Az.otf') format('opentype'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Medium Az.otf') format('opentype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Semi Bold Az.otf') format('opentype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Sofia Pro'; src: url('/fonts/sofia-pro/Sofia Pro Bold Az.otf') format('opentype'); font-weight: 700; font-display: swap; }
+
+/* ---------- Tokens ---------- */
+:root {
+  --c-night: #0d0417;
+  --c-deep: #12071f;
+  --c-dusk: #1b0733;
+  --c-cherry: #3b1261;
+  --c-violet: #6b21a8;
+  --c-clarke: #9333ea;
+  --c-accent: #a855f7;
+  --c-mauve: #c084fc;
+  --c-lilac: #e9d5ff;
+  --c-linen: #f0ede8;
+  --c-white: #fbfaf8;
+  --c-ink: #383d4e;
+
+  --font-display: 'Wizard World', Georgia, serif;
+  --font-body: 'Sofia Pro', Helvetica, Arial, sans-serif;
+
+  --fs-s: clamp(0.8rem, 0.78rem + 0.1vw, 0.9rem);
+  --fs-m: clamp(0.94rem, 0.9rem + 0.2vw, 1.125rem);
+  --fs-l: clamp(1.1rem, 1.05rem + 0.3vw, 1.4rem);
+  --fs-xl: clamp(1.3rem, 1.2rem + 0.5vw, 1.75rem);
+  --fs-2xl: clamp(1.6rem, 1.4rem + 0.9vw, 2.2rem);
+  --fs-3xl: clamp(1.9rem, 1.6rem + 1.4vw, 2.75rem);
+  --fs-4xl: clamp(2.2rem, 1.8rem + 2vw, 3.45rem);
+  --fs-5xl: clamp(2.6rem, 2rem + 2.8vw, 4.3rem);
+  --fs-6xl: clamp(3.1rem, 2.2rem + 4vw, 5.4rem);
+
+  --page-padding: max(1rem, 3.5vw);
+  --container: 120rem;
+  --section-s: clamp(3rem, 2rem + 4vw, 5rem);
+  --section-m: clamp(4rem, 2.5rem + 6vw, 7rem);
+  --section-l: clamp(5rem, 3rem + 8vw, 10rem);
+
+  --radius-s: 0.75rem;
+  --radius-l: 2.5rem;
+  --ease: cubic-bezier(0.491, 0.153, 0.094, 0.884);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tema padrão (claro); seções escuras sobrescrevem com .theme-dark */
+  --bg: var(--c-white);
+  --bg-2: var(--c-linen);
+  --text: var(--c-ink);
+  --text-accent: var(--c-violet);
+  --border: color-mix(in srgb, var(--c-ink) 22%, transparent);
+  --detail: var(--c-mauve);
+}
+
+.theme-dark {
+  --bg: var(--c-dusk);
+  --bg-2: var(--c-deep);
+  --text: var(--c-linen);
+  --text-accent: var(--c-mauve);
+  --border: rgba(255, 255, 255, 0.16);
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: var(--c-night);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-m);
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure, blockquote {
+  margin: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+}
+h2 { font-size: var(--fs-5xl); }
+h3 { font-size: var(--fs-3xl); }
+h4 { font-size: var(--fs-xl); }
+
+:where(h1, h2, h3, .statement-text) em {
+  color: var(--text-accent);
+  font-style: normal;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--c-violet);
+  color: var(--c-white);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+section {
+  position: relative;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- Utilitários ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--page-padding);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10000;
+  padding: 0.75rem 1rem;
+  background: var(--c-white);
+  color: var(--c-cherry);
+  border-radius: var(--radius-s);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Elementos que entram ao rolar (ativados por scripts/reveal) */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s var(--ease-out), transform 0.9s var(--ease-out);
+  }
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+}

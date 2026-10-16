@@ -1,0 +1,196 @@
+---
+// Slider de imagens com transições WebGL (ogl). Renderiza a marcação no servidor;
+// o script abaixo liga o canvas, arraste, teclado, autoplay e indicadores.
+import Icon from './ui/Icon.astro';
+import './MorphSlider.css';
+
+export interface MorphItem {
+  image: string;
+  caption?: string;
+}
+
+interface Props {
+  items: MorphItem[];
+  transition?: 'melt' | 'ripple' | 'shear' | 'swirl';
+  duration?: number;
+  intensity?: number;
+  scale?: number;
+  aberration?: number;
+  drift?: number;
+  autoplay?: boolean;
+  autoplayDelay?: number;
+  loop?: boolean;
+  radius?: number;
+  overlayColor?: string;
+  label?: string;
+}
+
+const {
+  items,
+  transition = 'melt',
+  duration = 1.1,
+  intensity = 0.55,
+  scale = 2.4,
+  aberration = 0.35,
+  drift = 0.4,
+  autoplay = true,
+  autoplayDelay = 4,
+  loop = true,
+  radius = 20,
+  overlayColor = '#12071f',
+  label = 'Galeria de imagens',
+} = Astro.props;
+
+const options = { transition, duration, intensity, scale, aberration, drift, autoplay, autoplayDelay, loop, overlayColor };
+---
+
+<div
+  class="morph-slider"
+  data-morph-slider
+  data-options={JSON.stringify(options)}
+  data-images={JSON.stringify(items.map((item) => item.image))}
+  style={`border-radius:${radius}px;--ms-swap:${(duration * 0.66).toFixed(3)}s;--ms-dot:${(duration * 0.45).toFixed(3)}s`}
+>
+  <div class="morph-slider-stage" role="group" aria-roledescription="carrossel" aria-label={label} tabindex="0">
+    <!-- Antes do WebGL carregar (ou sem WebGL) mostra a primeira imagem -->
+    <img class="morph-slider-fallback" src={items[0]?.image} alt="" />
+  </div>
+
+  <div class="morph-slider-caption" aria-live="polite">
+    {
+      items.map((item, i) =>
+        item.caption ? (
+          <span class:list={['morph-slider-caption-text', { 'is-active': i === 0 }]} aria-hidden={i === 0 ? undefined : 'true'}>
+            {item.caption}
+          </span>
+        ) : null,
+      )
+    }
+  </div>
+
+  <div class="morph-slider-controls">
+    <button type="button" class="morph-slider-btn" aria-label="Imagem anterior" data-prev><Icon name="arrow-left" size="18" /></button>
+    <button type="button" class="morph-slider-btn" aria-label="Próxima imagem" data-next><Icon name="arrow-right" size="18" /></button>
+  </div>
+
+  <div class="morph-slider-indicators" role="tablist" aria-label="Imagens">
+    {
+      items.map((_, i) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={['morph-slider-dot', { 'is-active': i === 0 }]}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-label={`Ir para a imagem ${i + 1}`}
+          data-dot={i}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import { MorphEngine, type MorphOptions } from '../lib/morph-engine';
+
+  document.querySelectorAll<HTMLElement>('[data-morph-slider]').forEach((root) => {
+    const stage = root.querySelector<HTMLElement>('.morph-slider-stage')!;
+    const options: MorphOptions & { autoplay: boolean; autoplayDelay: number } = JSON.parse(root.dataset.options!);
+    const images: string[] = JSON.parse(root.dataset.images!);
+    const captions = [...root.querySelectorAll<HTMLElement>('.morph-slider-caption-text')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+
+    let index = 0;
+    let hovering = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const scheduleAutoplay = () => {
+      clearTimeout(timer);
+      if (!options.autoplay || hovering) return;
+      timer = setTimeout(() => {
+        // Se a troca for ignorada (ex.: durante um arraste), tenta de novo no próximo ciclo.
+        engine?.next();
+        scheduleAutoplay();
+      }, Math.max(options.autoplayDelay, 1) * 1000);
+    };
+
+    const setIndex = (i: number) => {
+      index = i;
+      captions.forEach((el, n) => {
+        el.classList.toggle('is-active', n === i);
+        if (n === i) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', 'true');
+      });
+      dots.forEach((el, n) => {
+        el.classList.toggle('is-active', n === i);
+        el.setAttribute('aria-selected', String(n === i));
+      });
+      scheduleAutoplay();
+    };
+
+    let engine: MorphEngine | undefined;
+    try {
+      engine = new MorphEngine(stage, {
+        images,
+        options,
+        reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        onIndexChange: setIndex,
+      });
+      stage.querySelector('.morph-slider-fallback')?.remove();
+    } catch (err) {
+      console.warn('MorphSlider: WebGL indisponível, exibindo imagem estática.', err);
+      return;
+    }
+
+    root.querySelector('[data-prev]')!.addEventListener('click', () => engine!.prev());
+    root.querySelector('[data-next]')!.addEventListener('click', () => engine!.next());
+    dots.forEach((dot, i) =>
+      dot.addEventListener('click', () => {
+        if (i !== index) engine!.goTo(i > index ? 1 : -1);
+      }),
+    );
+
+    root.addEventListener('mouseenter', () => {
+      hovering = true;
+      clearTimeout(timer);
+    });
+    root.addEventListener('mouseleave', () => {
+      hovering = false;
+      scheduleAutoplay();
+    });
+
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        engine!.next();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        engine!.prev();
+      }
+    });
+
+    // Arraste horizontal controla o progresso da transição.
+    let startX = 0;
+    let width = 1;
+    let dragging = false;
+    stage.addEventListener('pointerdown', (e) => {
+      const rect = stage.getBoundingClientRect();
+      width = rect.width || 1;
+      startX = e.clientX;
+      engine!.setPointer((e.clientX - rect.left) / rect.width, 1 - (e.clientY - rect.top) / rect.height);
+      dragging = engine!.beginDrag();
+      if (dragging) stage.setPointerCapture?.(e.pointerId);
+    });
+    stage.addEventListener('pointermove', (e) => {
+      if (dragging) engine!.drag((e.clientX - startX) / width);
+    });
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      engine!.endDrag();
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    scheduleAutoplay();
+  });
+</script>

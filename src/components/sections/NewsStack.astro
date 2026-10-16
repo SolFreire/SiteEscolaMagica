@@ -1,0 +1,367 @@
+---
+// Pilha de notícias: cada cartão fica preso no topo e o próximo desliza por cima,
+// inclinando e escurecendo os que ficam por baixo.
+import Icon from '../ui/Icon.astro';
+import { news } from '../../data/site';
+---
+
+<section class="news" aria-label="Crônicas de Hogwarts — Registro de Notícias Mágicas" data-news>
+  <header class="news-intro">
+    <p class="news-eyebrow">{news.eyebrow}</p>
+    <h2 class="news-title">{news.title}</h2>
+    <p class="news-sub">{news.text}</p>
+  </header>
+
+  <div class="stack">
+    {
+      news.items.map((item) => (
+        <article class="card" data-card>
+          <div class="card-media">
+            <div class="card-cover" style={`background-image:url('${item.image}')`} />
+          </div>
+          <div class="card-body">
+            <p class="card-date">{item.date}</p>
+            <p class="card-text">{item.body}</p>
+          </div>
+          <div class="card-foot">
+            <span class="card-tag">{item.tag}</span>
+            <button class="card-save" type="button" aria-label="Salvar esta crônica" aria-pressed="false" data-save>
+              <Icon name="plus" size="18" class="i-plus" />
+              <Icon name="check" size="18" class="i-check" />
+            </button>
+          </div>
+        </article>
+      ))
+    }
+    <div class="tail" aria-hidden="true"></div>
+  </div>
+
+  <div class="sr-only" aria-live="polite" data-live></div>
+</section>
+
+<style>
+  .news {
+    --card: #1d0d33;
+    --muted: rgba(255, 255, 255, 0.68);
+    --faint: rgba(255, 255, 255, 0.45);
+    --line: rgba(255, 255, 255, 0.14);
+    --gap: 46vh;
+    min-height: 100svh;
+    padding: 0 clamp(16px, 4vw, 40px) clamp(60px, 12vh, 140px);
+    background: radial-gradient(120% 80% at 50% -8%, #2e0d4f 0%, var(--c-deep) 60%), var(--c-deep);
+    color: #fff;
+  }
+
+  .news-intro {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: clamp(48px, 10vh, 104px) 0 clamp(16px, 3vh, 34px);
+    text-align: center;
+  }
+  .news-eyebrow {
+    margin-bottom: 18px;
+    font: 600 12px/1 ui-monospace, 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-accent);
+  }
+  .news-title {
+    font-size: clamp(38px, 6.4vw, 72px);
+    line-height: 0.98;
+  }
+  .news-sub {
+    max-width: 48ch;
+    margin: 18px auto 0;
+    color: var(--muted);
+    font-size: clamp(14px, 1.4vw, 16.5px);
+  }
+
+  .stack {
+    width: min(80vw, 1080px);
+    margin: 0 auto;
+  }
+  .card {
+    position: sticky;
+    top: var(--top, 88px);
+    display: grid;
+    grid-template-columns: minmax(180px, 42%) 1fr;
+    grid-template-rows: 1fr auto;
+    gap: clamp(16px, 1.6vw, 26px);
+    min-height: clamp(300px, 46vh, 480px);
+    margin: 0 0 var(--gap);
+    padding: clamp(14px, 1.4vw, 20px);
+    border: 1px solid var(--line);
+    border-radius: clamp(18px, 2vw, 26px);
+    background: var(--card);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 40px 80px -34px rgba(0, 0, 0, 0.75);
+    transform-origin: 50% 0;
+    will-change: transform, filter;
+  }
+  .card:last-of-type {
+    margin-bottom: 0;
+  }
+  .tail {
+    height: 66vh;
+  }
+
+  .card-media {
+    position: relative;
+    grid-row: 1 / span 2;
+    min-height: 210px;
+    border-radius: clamp(12px, 1.2vw, 18px);
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  .card-cover {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.12);
+    transition: transform 1.15s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .card-body {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 8px clamp(4px, 1vw, 18px) 0 clamp(4px, 1vw, 10px);
+  }
+  .card-date {
+    margin-bottom: clamp(12px, 1.4vw, 22px);
+    font-size: clamp(12.5px, 1vw, 14px);
+    font-weight: 500;
+    color: var(--faint);
+  }
+  .card-text {
+    max-width: 46ch;
+    font-size: clamp(15px, 1.5vw, 22px);
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+    color: #f3f0f7;
+  }
+
+  .card-foot {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 clamp(4px, 1vw, 12px);
+  }
+  .card-tag {
+    padding: 8px 15px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 999px;
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--c-lilac);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .card-save {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.22s ease, transform 0.18s ease;
+  }
+  .card-save:hover {
+    transform: scale(1.06);
+    background: rgba(255, 255, 255, 0.24);
+  }
+  .card-save:active {
+    transform: scale(0.94);
+  }
+  .card-save[aria-pressed='true'] {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+  .card-save :global(.i-check),
+  .card-save[aria-pressed='true'] :global(.i-plus) {
+    display: none;
+  }
+  .card-save[aria-pressed='true'] :global(.i-check) {
+    display: block;
+  }
+
+  /* Conteúdo aparece quando o cartão chega na posição (classe .is-in via JS) */
+  .card-date,
+  .card-text,
+  .card-foot {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .card.is-in .card-cover {
+    transform: scale(1);
+  }
+  .card.is-in :is(.card-date, .card-text, .card-foot) {
+    opacity: 1;
+    transform: none;
+  }
+  .card.is-in .card-date {
+    transition-delay: 0.12s;
+  }
+  .card.is-in .card-text {
+    transition-delay: 0.2s;
+  }
+  .card.is-in .card-foot {
+    transition-delay: 0.3s;
+  }
+
+  @media (max-width: 900px) {
+    .stack {
+      width: 86vw;
+    }
+    .card {
+      min-height: clamp(280px, 42vh, 420px);
+    }
+  }
+  @media (max-width: 620px) {
+    .stack {
+      width: 92vw;
+    }
+    .card {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 13px;
+      min-height: 0;
+      padding: 12px;
+      border-radius: 20px;
+    }
+    .card-media {
+      grid-row: 1;
+      aspect-ratio: 16 / 10;
+      min-height: 0;
+    }
+    .card-body,
+    .card-foot {
+      grid-column: 1;
+      padding-inline: 4px;
+    }
+    .card-text {
+      max-width: none;
+      font-size: 15.5px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-cover,
+    .card-date,
+    .card-text,
+    .card-foot {
+      opacity: 1;
+      transform: none !important;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const S = {
+    baseVh: 5,
+    peekPx: 34,
+    revealPx: 480,
+    revealAt: 0.5,
+    persp: 1500,
+    arriveTilt: 15,
+    buriedTilt: 3,
+    scaleStep: 0.035,
+    dimStep: 0.02,
+    liftPx: 4,
+  };
+
+  const section = document.querySelector<HTMLElement>('[data-news]');
+  if (section) {
+    const cards = [...section.querySelectorAll<HTMLElement>('[data-card]')];
+    const live = section.querySelector<HTMLElement>('[data-live]');
+    const N = cards.length;
+    const shown = new Array(N).fill(false);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
+
+    section.querySelectorAll<HTMLButtonElement>('[data-save]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        btn.setAttribute('aria-pressed', String(on));
+        btn.setAttribute('aria-label', on ? 'Salvo — clique para remover' : 'Salvar esta crônica');
+      }),
+    );
+
+    let restTops: number[] = [];
+    let cardH = 400;
+
+    // Calcula onde cada cartão "estaciona", deixando uma borda do anterior visível.
+    const layout = () => {
+      const vh = window.innerHeight;
+      cardH = cards[0]?.offsetHeight ?? 400;
+      const centred = (vh - cardH) / 2 - ((N - 1) / 2) * S.peekPx;
+      const base = Math.max(centred, (S.baseVh / 100) * vh);
+      restTops = cards.map((el, i) => {
+        const t = Math.round(base + i * S.peekPx);
+        el.style.setProperty('--top', `${t}px`);
+        return t;
+      });
+    };
+
+    let lastCur = -1;
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const vh = window.innerHeight;
+      const revealLine = vh - S.revealAt * cardH;
+      const hideLine = vh - 0.04 * cardH;
+      const tops = cards.map((el) => el.getBoundingClientRect().top);
+      const risen = tops.map((top, i) => clamp((restTops[i] + S.revealPx - top) / S.revealPx, 0, 1));
+
+      // b = quanto o cartão já foi coberto pelos de cima
+      let buried = 0;
+      for (let i = N - 1; i >= 0; i--) {
+        const el = cards[i];
+        const b = buried;
+        if (!reduce) {
+          const rx = S.arriveTilt * (1 - risen[i]) - S.buriedTilt * b;
+          el.style.transform = `perspective(${S.persp}px) translateY(${(-b * S.liftPx).toFixed(2)}px) rotateX(${rx.toFixed(2)}deg) scale(${(1 - S.scaleStep * b).toFixed(4)})`;
+          el.style.filter = `brightness(${(1 - S.dimStep * b).toFixed(4)})`;
+        }
+        el.style.zIndex = String(10 + i);
+
+        if (!shown[i] && tops[i] <= revealLine) {
+          el.classList.add('is-in');
+          shown[i] = true;
+        } else if (shown[i] && tops[i] >= hideLine) {
+          el.classList.remove('is-in');
+          shown[i] = false;
+        }
+        buried += risen[i];
+      }
+
+      const cur = clamp(Math.round(risen.reduce((a, r) => a + r, 0)), 1, N);
+      if (cur !== lastCur && live) {
+        lastCur = cur;
+        live.textContent = `Crônica ${cur} de ${N}`;
+      }
+    };
+
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    layout();
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => {
+      layout();
+      onScroll();
+    });
+  }
+</script>

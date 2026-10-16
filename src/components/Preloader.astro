@@ -1,0 +1,63 @@
+---
+import { site } from '../data/site';
+---
+
+<div class="preloader" aria-hidden="true">
+  <div class="preloader-logo">
+    <img src={site.crest} alt="" class="preloader-crest" />
+    <p class="preloader-title">{site.name}</p>
+  </div>
+</div>
+
+<style>
+  .preloader {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 99999;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: clip;
+    background: var(--c-cherry);
+    color: var(--c-white);
+    pointer-events: none;
+    animation: preloader-out 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards;
+  }
+  .preloader-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    animation: preloader-logo 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards;
+  }
+  .preloader-crest {
+    height: 7.5rem;
+    width: auto;
+    filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+  }
+  .preloader-title {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  }
+
+  @keyframes preloader-out {
+    to {
+      height: 0;
+    }
+  }
+  @keyframes preloader-logo {
+    to {
+      transform: scale(0.8);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preloader {
+      animation-duration: 0.01s;
+    }
+  }
+</style>

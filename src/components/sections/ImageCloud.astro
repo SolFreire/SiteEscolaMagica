@@ -1,0 +1,167 @@
+---
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import { imageCloud } from '../../data/site';
+import { rich } from '../../lib/rich';
+
+// Posição, largura e velocidade de cada imagem lateral.
+const layout = [
+  { top: '35%', right: '0', width: '30%', speed: '-20vh', ratio: '16/9' },
+  { top: '40%', left: '5%', width: '20%', speed: '-50vh', ratio: '4/3' },
+  { top: '50%', left: '50%', width: '15%', speed: '-60vh', ratio: '16/9' },
+  { top: '55%', left: '15%', width: '30%', speed: '-30vh', ratio: '16/9' },
+];
+---
+
+<section class="cloud theme-dark">
+  <div class="cloud-content">
+    <Eyebrow text={imageCloud.eyebrow} center />
+    <h2 set:html={rich(imageCloud.title)} />
+    <Button href={imageCloud.cta.href}>{imageCloud.cta.label}</Button>
+  </div>
+
+  <div class="cloud-scroll">
+    <div class="cloud-center-sticky">
+      <div class="cloud-center">
+        <img src={imageCloud.center.src} alt={imageCloud.center.alt} loading="lazy" />
+        <div class="cloud-center-overlay"></div>
+      </div>
+    </div>
+    {
+      imageCloud.side.map((src, i) => {
+        const l = layout[i % layout.length];
+        return (
+          <div
+            class="cloud-side"
+            style={`top:${l.top};${l.left ? `left:${l.left}` : `right:${l.right}`};width:${l.width};--speed:${l.speed};--ratio:${l.ratio}`}
+          >
+            <img src={src} alt="" loading="lazy" />
+          </div>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .cloud {
+    background: var(--c-ink);
+    color: var(--c-linen);
+  }
+
+  .cloud-content {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding-inline: var(--page-padding);
+    text-align: center;
+  }
+  .cloud-content h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  .cloud-scroll {
+    position: relative;
+    height: 200vh;
+    margin-top: -20vh;
+    view-timeline: --cloud block;
+  }
+  .cloud-center-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cloud-center {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: scale(0.3);
+  }
+  .cloud-center img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cloud-center-overlay {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--c-dusk) 55%, transparent);
+    opacity: 0;
+  }
+
+  .cloud-side {
+    position: absolute;
+  }
+  .cloud-side img {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+    border-radius: var(--radius-s);
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .cloud-center {
+        animation: cloud-grow ease-out both;
+        animation-timeline: --cloud;
+        animation-range: contain 5% contain 85%;
+      }
+      .cloud-center-overlay {
+        animation: cloud-dim ease-out both;
+        animation-timeline: --cloud;
+        animation-range: contain 5% contain 85%;
+      }
+      .cloud-side {
+        animation: cloud-float ease-out both;
+        animation-timeline: --cloud;
+        animation-range: contain 0% contain 100%;
+      }
+    }
+  }
+
+  @keyframes cloud-grow {
+    from {
+      transform: scale(0.3);
+      height: 80%;
+    }
+    15% {
+      transform: scale(0.3);
+      height: 100%;
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes cloud-dim {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes cloud-float {
+    to {
+      translate: 0 var(--speed);
+    }
+  }
+
+  /* Sem scroll-driven animations: mostra a imagem central já aberta */
+  @supports not (animation-timeline: view()) {
+    .cloud-center {
+      transform: none;
+    }
+    .cloud-center-overlay {
+      opacity: 1;
+    }
+  }
+</style>

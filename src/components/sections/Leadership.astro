@@ -1,0 +1,99 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { leadership } from '../../data/site';
+import { rich } from '../../lib/rich';
+---
+
+<section class="leadership">
+  <div class="glow glow-a" aria-hidden="true"></div>
+  <div class="glow glow-b" aria-hidden="true"></div>
+  <div class="container leadership-inner">
+    <div class="leadership-intro">
+      <h2 set:html={rich(leadership.title)} />
+      <p>{leadership.text}</p>
+      <Button href={leadership.cta.href}>{leadership.cta.label}</Button>
+    </div>
+    <div class="leadership-cards">
+      {
+        leadership.cards.map((card) => (
+          <article class="leadership-card" data-reveal>
+            <Icon name={card.icon} size="3rem" class="leadership-icon" />
+            <h4>{card.title}</h4>
+            <p>{card.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .leadership {
+    padding-block: var(--section-m);
+    overflow: clip;
+  }
+  .glow {
+    position: absolute;
+    width: 100vw;
+    aspect-ratio: 1;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+  .glow-a {
+    top: -50vw;
+    right: -50vw;
+    background: radial-gradient(circle, rgba(107, 33, 168, 0.9), transparent 70%);
+  }
+  .glow-b {
+    bottom: -20vw;
+    left: -50vw;
+    background: radial-gradient(circle, rgba(76, 29, 149, 0.8), transparent 70%);
+  }
+
+  .leadership-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-s);
+  }
+  .leadership-intro {
+    max-width: 50rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .leadership-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem 3rem;
+  }
+  .leadership-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    background: var(--bg);
+  }
+  .leadership-card :global(.leadership-icon) {
+    color: var(--detail);
+  }
+  .leadership-card:nth-child(2) {
+    transition-delay: 0.1s;
+  }
+  .leadership-card:nth-child(3) {
+    transition-delay: 0.2s;
+  }
+
+  @media (max-width: 991px) {
+    .leadership-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

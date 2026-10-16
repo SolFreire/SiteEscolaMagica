@@ -1,0 +1,72 @@
+---
+import { nextPages } from '../../data/site';
+---
+
+<section class="next">
+  <div class="container">
+    <h3 class="next-title">Para Onde Deseja Ir?</h3>
+    <div class="next-list">
+      {
+        nextPages.map((page) => (
+          <a class="next-card" href={page.href}>
+            <img src={page.image} alt="" loading="lazy" />
+            <span class="next-card-title">{page.title}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .next {
+    padding-block: var(--section-l);
+  }
+  .next-title {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .next-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(22.5rem, 100%), 1fr));
+    gap: 1rem 0.5rem;
+  }
+  .next-card {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    aspect-ratio: 2;
+    max-height: 30rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-s);
+    overflow: clip;
+    color: var(--c-white);
+    text-decoration: none;
+  }
+  .next-card::after {
+    content: '';
+    position: absolute;
+    inset: 40% 0 0;
+    background: linear-gradient(transparent, rgba(18, 7, 31, 0.8));
+  }
+  .next-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 10%;
+    transition: transform 0.35s var(--ease);
+  }
+  .next-card:is(:hover, :focus-visible) img {
+    transform: scale(1.1);
+  }
+  .next-card-title {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    text-align: center;
+  }
+</style>

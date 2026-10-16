@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Statement from '../components/sections/Statement.astro';
+import YearCards from '../components/sections/YearCards.astro';
+import Testimonial from '../components/sections/Testimonial.astro';
+import AcademicExcellence from '../components/sections/AcademicExcellence.astro';
+import InfoBlock from '../components/sections/InfoBlock.astro';
+import Cta from '../components/sections/Cta.astro';
+import Leadership from '../components/sections/Leadership.astro';
+import ImageCloud from '../components/sections/ImageCloud.astro';
+import Gallery from '../components/sections/Gallery.astro';
+import NewsStack from '../components/sections/NewsStack.astro';
+import NextPages from '../components/sections/NextPages.astro';
+import { discover, infoBlocks, years } from '../data/site';
+---
+
+<Layout>
+  <Hero />
+  <Statement />
+  <YearCards title="Do primeiro feitiço à <br/>*maestria mágica*" cards={years} />
+  <Testimonial />
+  <AcademicExcellence />
+  {infoBlocks.map((block) => <InfoBlock {...block} />)}
+  <Cta />
+  <YearCards title="Explore o *Universo de Hogwarts*" cards={discover} />
+  <Leadership />
+  <ImageCloud />
+  <Gallery />
+  <NewsStack />
+  <NextPages />
+</Layout>

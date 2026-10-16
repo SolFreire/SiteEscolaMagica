@@ -1,0 +1,135 @@
+---
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import { academic } from '../../data/site';
+import { rich } from '../../lib/rich';
+---
+
+<section class="academic">
+  <div class="container">
+    <hr class="divider" />
+    <div class="academic-intro">
+      <div class="academic-heading">
+        <Eyebrow text={academic.eyebrow} />
+        <h2 set:html={rich(academic.title)} />
+      </div>
+      <p class="academic-text">{academic.text}</p>
+    </div>
+
+    <div class="academic-stats" data-counters>
+      {
+        academic.stats.map((stat) => (
+          <div class="stat" data-reveal>
+            <p class="stat-number">
+              <span data-counter={stat.value}>{stat.value}</span>
+              {stat.suffix}
+            </p>
+            <hr class="divider" />
+            <p>{stat.label}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="academic-cta">
+      <Button href={academic.cta.href}>{academic.cta.label}</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .academic {
+    padding-block: var(--section-l);
+    background: var(--bg-2);
+  }
+  .divider {
+    height: 1px;
+    margin: 0 0 1.5rem;
+    border: 0;
+    background: var(--border);
+  }
+
+  .academic-intro {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 4rem;
+  }
+  .academic-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .academic-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    margin-block: var(--section-s) calc(var(--section-s) + 8rem);
+  }
+  .stat-number {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(var(--fs-6xl), 12.5vw, 10rem);
+    line-height: 1;
+    color: var(--c-violet);
+  }
+
+  /* Escadinha: cada estatística desce um pouco em relação à anterior */
+  @media (min-width: 992px) {
+    .stat:nth-child(2) {
+      translate: 0 4rem;
+    }
+    .stat:nth-child(3) {
+      translate: 0 8rem;
+    }
+  }
+
+  .academic-cta {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 991px) {
+    .academic-intro,
+    .academic-stats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .academic-stats {
+      margin-bottom: var(--section-s);
+    }
+  }
+</style>
+
+<script>
+  // Conta de 0 até o valor quando as estatísticas aparecem.
+  const wrap = document.querySelector('[data-counters]');
+  if (wrap && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const counters = [...wrap.querySelectorAll<HTMLElement>('[data-counter]')];
+    counters.forEach((el) => (el.textContent = '0'));
+
+    const run = () => {
+      const start = performance.now();
+      const duration = 1500;
+      const tick = (now: number) => {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - (1 - p) * (1 - p);
+        counters.forEach((el) => {
+          el.textContent = String(Math.round(Number(el.dataset.counter) * eased));
+        });
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          io.disconnect();
+          run();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(wrap);
+  }
+</script>

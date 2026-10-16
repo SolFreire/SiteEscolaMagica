@@ -1,0 +1,64 @@
+---
+import { statement } from '../../data/site';
+import { rich } from '../../lib/rich';
+---
+
+<section class="statement theme-dark">
+  <div class="statement-inner">
+    <h1 class="statement-heading">{statement.heading}</h1>
+    <p class="statement-text" set:html={rich(statement.text)} />
+  </div>
+</section>
+
+<style>
+  .statement {
+    z-index: 9;
+    padding: var(--section-l) var(--page-padding);
+    background: var(--c-cherry);
+    view-timeline: --statement;
+  }
+  .statement-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: min(90%, var(--container));
+    margin-inline: auto;
+  }
+  .statement-heading {
+    max-width: 48rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-m);
+    font-weight: 500;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+  .statement-text {
+    font-family: var(--font-display);
+    font-size: var(--fs-5xl);
+    line-height: 1.2;
+  }
+
+  /* Texto que "acende" conforme a seção rola (navegadores com scroll-driven animations) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .statement-text {
+        color: color-mix(in srgb, var(--text) 30%, transparent);
+        background: linear-gradient(90deg, var(--text) 90%, transparent) no-repeat;
+        background-size: 0% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: fill-text linear both;
+        animation-timeline: --statement;
+        animation-range: contain 10% exit 20%;
+      }
+      .statement-text :global(em) {
+        -webkit-text-fill-color: var(--c-mauve);
+      }
+      @keyframes fill-text {
+        to {
+          background-size: 110% 100%;
+        }
+      }
+    }
+  }
+</style>

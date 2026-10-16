@@ -1,0 +1,61 @@
+---
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import { cta, site } from '../../data/site';
+---
+
+<section class="cta theme-dark">
+  <div class="container">
+    <div class="cta-card" data-reveal>
+      <div class="cta-glow" aria-hidden="true"></div>
+      <img class="cta-crest" src={site.crest} alt="Brasão de Hogwarts" loading="lazy" />
+      <Eyebrow text={cta.eyebrow} center />
+      <h2><em>{cta.title}</em></h2>
+      <p>{cta.text}</p>
+      <Button href={cta.button.href}>{cta.button.label}</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    padding-block: var(--section-m);
+    background: var(--c-dusk);
+  }
+  .cta-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    min-height: 30rem;
+    padding: clamp(2.5rem, 5vw, 4.5rem) 1.5rem;
+    border-radius: var(--radius-s) var(--radius-l) var(--radius-s) var(--radius-s);
+    overflow: clip;
+    background: color-mix(in srgb, var(--c-cherry) 55%, var(--c-dusk));
+    text-align: center;
+  }
+  .cta-glow {
+    position: absolute;
+    top: -30%;
+    right: -20%;
+    width: 70vw;
+    aspect-ratio: 1;
+    background: radial-gradient(circle, rgba(107, 33, 168, 0.45), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-card > :not(.cta-glow) {
+    position: relative;
+  }
+  .cta-crest {
+    width: clamp(140px, 18vw, 220px);
+    height: auto;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 10px 25px rgba(59, 18, 97, 0.25));
+    transition: transform 0.4s, filter 0.4s;
+  }
+  .cta-crest:hover {
+    transform: scale(1.06);
+    filter: drop-shadow(0 15px 35px rgba(168, 85, 247, 0.4));
+  }
+</style>

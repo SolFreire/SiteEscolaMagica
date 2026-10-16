@@ -1,0 +1,69 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'link';
+  size?: 'small' | 'medium';
+  arrow?: boolean;
+  class?: string;
+}
+
+const { href, variant = 'primary', size = 'medium', arrow = false, class: className } = Astro.props;
+---
+
+<a href={href} class:list={['btn', `btn-${variant}`, `btn-${size}`, className]}>
+  <slot />
+  {arrow && <Icon name="arrow-right" class="btn-arrow" />}
+</a>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-s);
+    font-weight: 600;
+    line-height: 1.1;
+    text-decoration: none;
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9em;
+  }
+
+  .btn-primary {
+    background: #4c1d95;
+    color: var(--c-white);
+  }
+  .btn-primary:hover {
+    background: #3b0764;
+  }
+
+  .btn-secondary {
+    border-color: color-mix(in srgb, currentColor 30%, transparent);
+    color: var(--text);
+  }
+  .btn-secondary:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  .btn-link {
+    padding-inline: 0;
+    color: currentColor;
+  }
+
+  .btn :global(.btn-arrow) {
+    transition: transform 0.25s var(--ease-out);
+  }
+  .btn:hover :global(.btn-arrow) {
+    transform: translateX(0.25rem);
+  }
+</style>

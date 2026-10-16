@@ -1,0 +1,410 @@
+---
+import Logo from './Logo.astro';
+import Icon from './ui/Icon.astro';
+import Eyebrow from './ui/Eyebrow.astro';
+import Button from './ui/Button.astro';
+import { ctas, navGroups, quickLinks, site } from '../data/site';
+---
+
+<header class="navbar" data-navbar>
+  <div class="navbar-inner">
+    <Logo />
+    <nav class="navbar-actions" aria-label="Principal">
+      <a class="nav-cta nav-visit" href={ctas.visit.href}>{ctas.visit.label}</a>
+      <a class="nav-cta nav-apply" href={ctas.admission.href}>{ctas.admission.label}</a>
+      <button class="nav-cta nav-trigger" type="button" data-menu-open aria-haspopup="dialog">
+        <Icon name="menu" />
+        <span>Menu</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<dialog class="menu theme-dark" data-menu aria-label="Menu do site">
+  <div class="menu-inner container">
+    <div class="menu-top">
+      <Logo />
+      <form action="/search" class="menu-search" role="search">
+        <label class="sr-only" for="menu-search">Buscar</label>
+        <input id="menu-search" name="query" type="search" placeholder="Buscar feitiço, local..." required />
+        <button type="submit" aria-label="Buscar"><Icon name="search" /></button>
+      </form>
+      <button class="nav-cta nav-trigger" type="button" data-menu-close>
+        <Icon name="close" />
+        <span>Fechar</span>
+      </button>
+    </div>
+
+    <div class="menu-main">
+      <div class="menu-groups-area">
+        <Eyebrow text="Para onde ir?" />
+        <div class="menu-groups">
+          {
+            navGroups.map((group, i) => (
+              <details name="nav-group" open={i === 0}>
+                <summary>{group.title}</summary>
+                <ul class="group-panel">
+                  {group.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+
+      <aside class="menu-aside">
+        <div class="menu-mobile-cta">
+          <Button href={ctas.visit.href} variant="secondary">{ctas.visit.label}</Button>
+          <Button href={ctas.letter.href}>{ctas.letter.label}</Button>
+        </div>
+        <Eyebrow text="Acesso Rápido" />
+        <ul class="quick-links">
+          {quickLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </aside>
+    </div>
+
+    <p class="menu-credits">
+      <span>{site.fullName}</span>
+      <span>{site.address}</span>
+      <span>{site.contact}</span>
+    </p>
+  </div>
+  <img src={site.crest} alt="" class="menu-crest" aria-hidden="true" />
+</dialog>
+
+<style>
+  /* ---------- Barra fixa ---------- */
+  .navbar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 999;
+    color: var(--c-white);
+    transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.4s, color 0.4s;
+  }
+  .navbar::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 -3rem;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent);
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .navbar.is-fill {
+    background: var(--c-white);
+    color: var(--c-ink);
+    --crest-filter: brightness(0);
+  }
+  .navbar.is-fill::before {
+    opacity: 0;
+  }
+  .navbar.is-hidden {
+    transform: translateY(-100%);
+  }
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4rem;
+    padding-left: var(--page-padding);
+  }
+  .navbar-actions {
+    display: flex;
+    align-self: stretch;
+  }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 7.5rem;
+    padding: 1.4rem;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nav-apply {
+    background: var(--c-cherry);
+    color: var(--c-white);
+  }
+  .nav-trigger {
+    min-width: 9.5rem;
+    background: var(--c-white);
+    color: var(--c-cherry);
+  }
+  .nav-apply:hover,
+  .nav-trigger:hover {
+    filter: brightness(1.1);
+  }
+  .nav-visit:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 1120px) {
+    .nav-visit {
+      display: none;
+    }
+  }
+  @media (max-width: 479px) {
+    .nav-apply {
+      display: none;
+    }
+    .nav-trigger {
+      min-width: 0;
+    }
+  }
+
+  /* ---------- Menu em tela cheia ---------- */
+  .menu {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden auto;
+    background: var(--c-dusk);
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.4s, display 0.4s allow-discrete, overlay 0.4s allow-discrete;
+  }
+  .menu[open] {
+    opacity: 1;
+  }
+  @starting-style {
+    .menu[open] {
+      opacity: 0;
+    }
+  }
+  .menu::backdrop {
+    background: transparent;
+  }
+
+  .menu-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    min-height: 100%;
+    padding-block: 0 2rem;
+    padding-right: 0;
+  }
+  .menu-top {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: 4rem;
+  }
+  .menu-top .nav-trigger {
+    margin-left: auto;
+    align-self: stretch;
+  }
+
+  .menu-search {
+    display: flex;
+    flex: 0 1 22rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .menu-search input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: max(16px, 1rem);
+  }
+  .menu-search input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .menu-search button {
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .menu-main {
+    display: flex;
+    gap: 3rem;
+    flex: 1;
+    padding-right: var(--page-padding);
+  }
+  .menu-groups-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .menu-groups {
+    position: relative;
+    width: 40%;
+  }
+
+  summary {
+    list-style: none;
+    padding: 0.4rem 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    line-height: 1.2;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s, color 0.2s;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover,
+  summary:focus-visible {
+    opacity: 1;
+    transform: translateX(0.5rem);
+  }
+  details[open] summary {
+    opacity: 1;
+    color: var(--c-mauve);
+    transform: none;
+  }
+
+  .group-panel {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 150%;
+    margin: 0;
+    padding: 0 0 0 4rem;
+    list-style: none;
+    display: grid;
+    gap: 0.6rem;
+    border-left: 1px solid var(--border);
+  }
+  .group-panel a,
+  .quick-links a {
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+    transition: background-size 0.25s ease-out;
+  }
+  .group-panel a {
+    font-size: var(--fs-xl);
+  }
+  .group-panel a:hover,
+  .quick-links a:hover {
+    background-size: 100% 1px;
+  }
+
+  .menu-aside {
+    flex: 0 0 16rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .menu-mobile-cta {
+    display: none;
+  }
+  .quick-links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+    opacity: 0.85;
+  }
+
+  .menu-credits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    padding-right: var(--page-padding);
+    font-size: var(--fs-s);
+    opacity: 0.7;
+  }
+
+  .menu-crest {
+    position: absolute;
+    right: 4vw;
+    bottom: 4vw;
+    height: 18rem;
+    width: auto;
+    opacity: 0.08;
+    filter: brightness(0) invert(1);
+    pointer-events: none;
+  }
+
+  @media (max-width: 767px) {
+    .menu-search {
+      display: none;
+    }
+    .menu-main {
+      flex-direction: column;
+    }
+    .menu-groups {
+      width: 100%;
+    }
+    .group-panel {
+      position: static;
+      width: auto;
+      padding: 0.5rem 0 1rem 1rem;
+    }
+    .menu-aside {
+      flex-basis: auto;
+    }
+    .menu-mobile-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+  }
+</style>
+
+<script>
+  const navbar = document.querySelector<HTMLElement>('[data-navbar]');
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+
+  // Barra: preenche ao sair do topo e se esconde ao rolar para baixo.
+  if (navbar) {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const update = () => {
+      const y = window.scrollY;
+      navbar.classList.toggle('is-fill', y > window.innerHeight * 0.8);
+      navbar.classList.toggle('is-hidden', y > 200 && y > lastY);
+      lastY = y;
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    update();
+  }
+
+  if (menu) {
+    const open = () => {
+      menu.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    };
+    const close = () => menu.close();
+    menu.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+    });
+    document.querySelectorAll('[data-menu-open]').forEach((btn) => btn.addEventListener('click', open));
+    menu.querySelectorAll('[data-menu-close], a').forEach((el) => el.addEventListener('click', close));
+  }
+</script>

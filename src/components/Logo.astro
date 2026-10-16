@@ -1,0 +1,38 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<a href="/" class:list={['logo', className]} aria-label={`${site.name} — página inicial`}>
+  <img src={site.crest} alt="" class="logo-crest" width="40" height="46" />
+  <span class="logo-name">{site.name}</span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .logo-crest {
+    height: 2.7rem;
+    width: auto;
+    /* Brasão monocromático que acompanha a cor do texto */
+    filter: var(--crest-filter, brightness(0) invert(1));
+    transition: filter 0.3s;
+  }
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+</style>

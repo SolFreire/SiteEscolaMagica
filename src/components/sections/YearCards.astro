@@ -1,0 +1,180 @@
+---
+import type { YearCard } from '../../data/site';
+import { rich } from '../../lib/rich';
+
+interface Props {
+  title: string;
+  cards: YearCard[];
+}
+
+const { title, cards } = Astro.props;
+---
+
+<section class="years">
+  <div class="container years-inner">
+    <h2 class="years-title" set:html={rich(title)} />
+    <div class="years-list">
+      {
+        cards.map((card) => (
+          <a class="year-card" href={card.href}>
+            <div class="year-card-info">
+              <div class="year-card-info-content">
+                <h3>{card.title}</h3>
+                {card.subtitle && <p>{card.subtitle}</p>}
+              </div>
+            </div>
+            <p class="year-card-label">{card.title}</p>
+            <figure class="year-card-media">
+              <img src={card.image} alt="" loading="lazy" style={`--pos-x: ${card.posX ?? '50%'}`} />
+            </figure>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .years {
+    padding-top: var(--section-m);
+  }
+  .years-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    min-height: 90svh;
+    padding-inline: 0;
+  }
+  .years-title {
+    max-width: 48rem;
+    padding-inline: var(--page-padding);
+    text-align: center;
+  }
+
+  .years-list {
+    flex: 1;
+    display: flex;
+    align-self: stretch;
+    border-radius: var(--radius-l) var(--radius-l) 0 0;
+    overflow: clip;
+  }
+
+  .year-card {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .year-card-info {
+    z-index: 3;
+    display: grid;
+    grid-template-rows: 0fr;
+    background: var(--c-linen);
+    transition: grid-template-rows 0.5s var(--ease);
+  }
+  .year-card:is(:hover, :focus-visible) .year-card-info {
+    grid-template-rows: 1fr;
+  }
+  .year-card-info-content {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-inline: 2.5rem;
+  }
+  .year-card-info-content h3 {
+    padding-top: 2.5rem;
+    color: var(--c-violet);
+  }
+  .year-card-info-content p {
+    padding-bottom: 1.25rem;
+    font-size: var(--fs-l);
+    font-weight: 600;
+  }
+
+  .year-card-label {
+    position: absolute;
+    top: 2.5rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding-inline: 1rem;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    text-align: center;
+    color: var(--c-white);
+    transition: opacity 0.3s;
+  }
+  .year-card:is(:hover, :focus-visible) .year-card-label {
+    opacity: 0;
+  }
+
+  .year-card-media {
+    position: relative;
+    flex: 1;
+    min-height: 24rem;
+  }
+  .year-card-media::before,
+  .year-card-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  /* gradiente para legibilidade do título */
+  .year-card-media::before {
+    background: linear-gradient(180deg, var(--c-ink), transparent);
+    opacity: 0.45;
+  }
+  /* escurece os cards que não estão em foco */
+  .year-card-media::after {
+    background: var(--c-ink);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .years-list:has(.year-card:hover) .year-card:not(:hover) .year-card-media::after {
+    opacity: 0.4;
+  }
+  .year-card-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--pos-x) 50%;
+  }
+
+  @media (max-width: 767px) {
+    .years-list {
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-inline: var(--page-padding);
+      border-radius: 0;
+    }
+    .year-card {
+      border-radius: var(--radius-l) var(--radius-l) 0 0;
+      overflow: clip;
+    }
+    .year-card-info {
+      grid-template-rows: 1fr;
+    }
+    .year-card-info-content {
+      padding-inline: 1.25rem;
+    }
+    .year-card-info-content h3 {
+      padding-top: 1.5rem;
+    }
+    .year-card-label {
+      display: none;
+    }
+    .year-card-media {
+      min-height: 0;
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>
